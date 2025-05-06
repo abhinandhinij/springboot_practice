@@ -12,8 +12,6 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 public class UserResponse {
 
-    @JsonIgnore
-    private int userId;
     private String message;
 
 }

@@ -19,6 +19,5 @@ public class User {
     @Email
     public String email;
     private String password;
-    private String roles;
 
 }

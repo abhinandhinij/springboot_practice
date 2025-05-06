@@ -30,10 +30,12 @@ public class HelloController {
     private PasswordEncoder encoder;
 
     @GetMapping("/getUsers")
-    public ResponseEntity<List<User>> getUsers(@RequestParam String role) {
+    public ResponseEntity<List<User>> getUsers(@RequestParam int minId,
+                                               @RequestParam int maxId) {
         return ResponseEntity.ok(userRepository.findAll()
                 .stream()
-                .filter(user -> user.getRoles().contains(role))
+                .filter(user -> user.getId() >= minId)
+                .filter(user -> user.getId() <= maxId)
                 .collect(Collectors.toList()));
     }
 
@@ -43,7 +45,7 @@ public class HelloController {
 
         if(userRepository.findById(user.getId()).isPresent())
         {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new UserResponse(user.getId(), "User with id " + user.getId() + " already exists!"));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new UserResponse("User with id " + user.getId() + " already exists!"));
         }
 
         // Encode password before saving to DB
@@ -53,10 +55,10 @@ public class HelloController {
                     logger.info("Created User");
                     return ResponseEntity
                             .status(HttpStatus.CREATED)
-                            .body(new UserResponse(saved.getId(), "User with id " + saved.getId() + " created successfully at " + LocalDateTime.now()));
+                            .body(new UserResponse("User with id " + saved.getId() + " created successfully at " + LocalDateTime.now()));
                 })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new UserResponse("Unable to create user!")));
     }
 }
 
